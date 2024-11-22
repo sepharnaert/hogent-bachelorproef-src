@@ -1,0 +1,58 @@
+---
+- name: Install and configure Postfix and GitLab
+  hosts: all
+  become: true
+  vars:
+    ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+  tasks:
+ 
+    - name: Install required dependecies
+      dnf:
+        name:
+          - curl
+          - policycoreutils
+          - openssh-server
+          - openssh-clients
+          - postfix
+          - libxcrypt-compat
+        state: present
+      
+    - name: Enable and start SSH service
+      systemd:
+        name: sshd
+        enabled: yes
+        state: started
+
+    - name: Enable and start Postfix service
+      systemd:
+        name: postfix
+        enabled: yes
+        state: started
+
+    - name: Copy a file to a specific folder on the VM
+      copy:
+        src: ./gitlab-ce.repo     
+        dest: /etc/yum.repos.d/gitlab-ce.repo
+
+    - name: Install GitLab-ce
+      dnf:
+        name:
+          - gitlab-ce    
+
+    - name: Configure GitLab
+      command: gitlab-ctl reconfigure
+
+    - name: Get the initial root password for GitLab
+      command: cat /etc/gitlab/initial_root_password
+      register: gitlab_root_password
+      ignore_errors: yes
+
+    - name: Extract only the password from the file content
+      set_fact:
+        gitlab_password: "{{ gitlab_root_password.stdout | regex_search('Password: (.*)', '\\1') }}"
+      when: gitlab_root_password.rc == 0
+
+    - name: Display the root password
+      debug:
+        msg: "The GitLab initial root password is: {{ gitlab_password }}"
+      when: gitlab_password is defined    
