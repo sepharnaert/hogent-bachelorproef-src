@@ -4,6 +4,8 @@
   become: true
   vars:
     ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+  roles:
+    - role: geerlingguy.node_exporter
   tasks:
  
     - name: Install required dependecies
@@ -55,4 +57,4 @@
     - name: Display the root password
       debug:
         msg: "The GitLab initial root password is: {{ gitlab_password }}"
-      when: gitlab_password is defined    
+      when: gitlab_password is defined   
