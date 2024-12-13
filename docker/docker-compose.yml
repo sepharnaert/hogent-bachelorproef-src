@@ -1,6 +1,6 @@
 services:
   gitlab:
-    image: docker.io/gitlab/gitlab-ce:latest
+    image: docker.io/gitlab/gitlab-ce:17.6.1-ce.0
     container_name: gitlab
     restart: always
     hostname: 'gitlab.example.com'
@@ -16,6 +16,17 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '.5'
+          cpus: '8.0'
           memory: '8G'
-
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    container_name: cadvisor
+    restart: always
+    network_mode: host
+    command:
+      - "--port=8000"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro

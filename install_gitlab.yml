@@ -49,6 +49,10 @@
       register: gitlab_root_password
       ignore_errors: yes
 
+    - name: Disable SELinux
+      selinux:
+        state: disabled
+
     - name: Extract only the password from the file content
       set_fact:
         gitlab_password: "{{ gitlab_root_password.stdout | regex_search('Password: (.*)', '\\1') }}"
