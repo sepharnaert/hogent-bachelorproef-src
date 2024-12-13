@@ -4,6 +4,8 @@
   become: true
   vars:
     ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+  roles:
+    - role: geerlingguy.node_exporter
   tasks:
  
     - name: Install required dependecies
@@ -47,6 +49,10 @@
       register: gitlab_root_password
       ignore_errors: yes
 
+    - name: Disable SELinux
+      selinux:
+        state: disabled
+
     - name: Extract only the password from the file content
       set_fact:
         gitlab_password: "{{ gitlab_root_password.stdout | regex_search('Password: (.*)', '\\1') }}"
@@ -55,4 +61,4 @@
     - name: Display the root password
       debug:
         msg: "The GitLab initial root password is: {{ gitlab_password }}"
-      when: gitlab_password is defined    
+      when: gitlab_password is defined   
