@@ -1,1 +1,0 @@
-{"rsync":{"/vagrant":{"type":"rsync","guestpath":"/vagrant","hostpath":"/home/sepha/hogent-bachelorproef-src","disabled":false,"__vagrantfile":true,"owner":"vagrant","group":"vagrant"}}}
